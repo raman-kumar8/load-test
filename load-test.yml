@@ -1,0 +1,65 @@
+config:
+  target: 'http://localhost:8080'  # Change this to your Cloud Run URL
+  phases:
+    # Warm-up phase
+    - duration: 30
+      arrivalRate: 1
+      name: "Warm-up"
+    # Gradual increase
+    - duration: 60
+      arrivalRate: 5
+      name: "Light load"
+    # Medium load
+    - duration: 120
+      arrivalRate: 15
+      name: "Medium load"
+    # Heavy load
+    - duration: 180
+      arrivalRate: 30
+      name: "Heavy load"
+    # Spike test
+    - duration: 60
+      arrivalRate: 50
+      name: "Spike test"
+    # Cool down
+    - duration: 30
+      arrivalRate: 5
+      name: "Cool down"
+
+scenarios:
+  - name: "Mixed Load Test"
+    weight: 60
+    flow:
+      - get:
+          url: "/load/light"
+      - think: 1
+      - get:
+          url: "/load/medium/{{ $randomInt(2, 8) }}"
+      - think: 2
+      - get:
+          url: "/stats"
+
+  - name: "Heavy Processing Test"
+    weight: 25
+    flow:
+      - post:
+          url: "/load/heavy"
+          json:
+            task_name: "artillery_test_{{ $randomInt(1, 1000) }}"
+            processing_time: "{{ $randomInt(3, 10) }}"
+            complexity: "{{ $pick('simple', 'medium', 'complex') }}"
+      - think: 3
+      - get:
+          url: "/stats"
+
+  - name: "Memory and Concurrency Test"
+    weight: 15
+    flow:
+      - get:
+          url: "/memory/allocate/{{ $randomInt(10, 50) }}"
+      - think: 1
+      - get:
+          url: "/concurrent/{{ $randomInt(5, 20) }}"
+      - think: 2
+      - get:
+          url: "/stats"
