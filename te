@@ -1,8 +1,1 @@
-concat(
-'Sender: ',
-first(outputs('Get_emails_(V3)')?['body/value'])?['from']?['emailAddress']?['address'],
-'\nSubject: ',
-first(outputs('Get_emails_(V3)')?['body/value'])?['subject'],
-'\nBody: ',
-first(outputs('Get_emails_(V3)')?['body/value'])?['bodyPreview']
-)
+e
