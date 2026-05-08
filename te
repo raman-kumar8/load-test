@@ -1,18 +1,8 @@
-You are an email parser.
-
-Extract structured data from the email content provided.
-
-Return ONLY this JSON schema:
-
-{
-  "sender": "",
-  "subject": "",
-  "intent": "",
-  "summary": "",
-  "priority": "",
-  "action_items": []
-}
-
-Do not return markdown.
-Do not explain anything.
-Return valid parsable JSON only.
+concat(
+'Sender: ',
+first(outputs('Get_emails_(V3)')?['body/value'])?['from']?['emailAddress']?['address'],
+'\nSubject: ',
+first(outputs('Get_emails_(V3)')?['body/value'])?['subject'],
+'\nBody: ',
+first(outputs('Get_emails_(V3)')?['body/value'])?['bodyPreview']
+)
